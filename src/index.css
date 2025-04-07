@@ -9,6 +9,14 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  --color-text: #000;
+  --color-bg: #f07547;
+  --color-link: rgb(0 0 0 / 70%);
+  --color-link-hover: #000;
+  --layer-width: 100vw;
+  --layer-height: 100vh;
+  --layer-radius: 0;
+  --page-padding: 1rem;
 }
 
 body {
@@ -24,4 +32,134 @@ html {
 
 .writing-mode-vertical {
   writing-mode: vertical-rl;
+}
+
+/* Page Loader */
+.js .loading::before,
+.js .loading::after {
+  content: '';
+  position: fixed;
+  z-index: 1000;
+  /* Add animation to automatically hide loader after 5 seconds */
+  animation: hideLoader 5s forwards;
+}
+
+.js .loading::before {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-bg);
+  /* Make slightly transparent for debugging */
+  opacity: 0.9;
+}
+
+.js .loading::after {
+  top: 50%;
+  left: 50%;
+  width: 60px;
+  height: 60px;
+  margin: -30px 0 0 -30px;
+  border-radius: 50%;
+  opacity: 0.4;
+  background: var(--color-link);
+  animation: loaderAnim 0.7s linear infinite alternate forwards, hideLoader 5s forwards;
+}
+
+@keyframes hideLoader {
+  0% {
+    opacity: 1;
+    visibility: visible;
+  }
+  90% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes loaderAnim {
+  to {
+    opacity: 1;
+    transform: scale3d(0.5,0.5,1);
+  }
+}
+
+.content {
+  grid-area: main;
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  grid-template-areas: 'content';
+}
+
+.content__inner {
+  grid-area: content;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem var(--page-padding) var(--page-padding);
+  will-change: transform;
+  z-index: 10; /* Ensure content is above layers */
+  background-color: rgba(255, 255, 255, 0.9); /* Add semi-transparent background */
+}
+
+.content__inner h2 {
+  font-size: clamp(2rem, 10vw, 13rem);
+  font-family: "gabriella", sans-serif;
+  text-transform: uppercase;
+  font-weight: 900;
+  margin: 0 0 2rem 0;
+  line-height: 1;
+  text-align: center;
+}
+
+.content__inner p {
+  font-size: clamp(1rem, 3vw, 2.5rem);
+  line-height: 1.2;
+  font-weight: 300;
+  max-width: 800px;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.layers {
+  grid-area: content;
+  align-self: center;
+  justify-self: center;
+  flex: none;
+  position: relative;
+  width: var(--layer-width);
+  height: var(--layer-height);
+}
+
+.layers__item,
+.layers__item-img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.layers__item {
+  overflow: hidden;
+  opacity: 0;
+  will-change: clip-path;
+  border-radius: var(--layer-radius);
+}
+
+.layers__item-img {
+  background-size: cover;
+  background-position: 50% 50%;
 }

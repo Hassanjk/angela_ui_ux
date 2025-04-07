@@ -1,8 +1,7 @@
 import React from 'react';
-import { Link } from 'react-scroll';
 import { motion } from 'framer-motion';
 
-const Navigation = () => {
+const Navigation = ({ onNavigate }) => {
   const navItems = [
     { id: 'home', label: 'HOME' },
     { id: 'about', label: 'ABOUT ME' },
@@ -26,6 +25,11 @@ const Navigation = () => {
     show: { x: 0, opacity: 1 }
   };
 
+  const handleClick = (e, id) => {
+    e.preventDefault();
+    onNavigate(id);
+  };
+
   return (
     <nav className="fixed right-0 top-0 h-screen flex items-center z-50">
       <motion.div 
@@ -46,15 +50,13 @@ const Navigation = () => {
               variants={item}
               className="relative py-6"
             >
-              <Link
-                to={id}
-                spy={true}
-                smooth={true}
-                duration={500}
+              <a
+                href={`#${id}`}
+                onClick={(e) => handleClick(e, id)}
                 className="flex flex-col items-center text-white hover:text-primary-200 transition-colors duration-300 text-xs tracking-wider cursor-pointer"
               >
                 <span className="writing-mode-vertical transform rotate-180">{label}</span>
-              </Link>
+              </a>
             </motion.li>
           ))}
         </motion.ul>

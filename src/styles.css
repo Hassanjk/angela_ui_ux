@@ -1,0 +1,166 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+.content--sticky {
+  width: 100vw;
+  position: sticky;
+  --offset: 0px;
+  top: var(--offset);
+  height: calc(100vh - var(--offset));
+}
+
+.bg-1 { background: #2f251e; }
+.bg-2 { background: #43392f; }
+
+.wrap {
+  position: relative;
+  z-index: 1;
+}
+
+i {
+  font-style: normal;
+  font-variation-settings: "slnt" 0, "wdth" 100, "wght" 400, "INKT" 400;
+}
+
+@media screen and (min-width: 768px) {
+  .content--half {
+    width: 50%;
+  }
+}
+
+body.loading {
+  overflow: hidden;
+}
+
+/* Testimonial Styles */
+.testimonial-container {
+  width: 100%;
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+.testimonial-grid {
+  display: grid;
+  gap: 5rem;
+}
+
+.image-container {
+  position: relative;
+  width: 100%;
+  height: 24rem;
+  perspective: 1000px;
+}
+
+.testimonial-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 1.5rem;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.testimonial-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.name {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #FDE3A7;
+  margin-bottom: 0.25rem;
+}
+
+.designation {
+  font-size: 0.875rem;
+  color: #9C4A37;
+  margin-bottom: 2rem;
+  letter-spacing: 1.12px;
+}
+
+.quote {
+  font-size: 1.125rem;
+  color: #FDE3A7;
+  line-height: 1.75;
+}
+
+.arrow-buttons {
+  display: flex;
+  gap: 1rem;
+  padding-top: 3rem;
+}
+
+.arrow-button {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background-color: #9C4A37;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  border: none;
+}
+
+.arrow-button:hover {
+  background-color: #FDE3A7;
+}
+
+.arrow-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: #0e0e0e;
+  transition: transform 0.3s;
+}
+
+.arrow-button:hover svg {
+  fill: #0e0e0e;
+}
+
+.prev-button:hover svg {
+  transform: rotate(-12deg);
+}
+
+.next-button:hover svg {
+  transform: rotate(12deg);
+}
+
+@media (min-width: 768px) {
+  .testimonial-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .arrow-buttons {
+    padding-top: 0;
+  }
+}
+
+/* Contact Form Animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
