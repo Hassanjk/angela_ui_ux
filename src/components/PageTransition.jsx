@@ -118,30 +118,57 @@ const PageTransition = ({ isLoading, onTransitionComplete, currentSection, prevS
           // For navigation between sections
           await preloadImages();
           
-          // Check if we're navigating to about, contact, or portfolio - use slide up for these
-          if (currentSection === 'about' || currentSection === 'contact' || currentSection === 'portfolio') {
-            // Use slide up animation for these specific sections
-            gsap.set(contentRef.current, { 
-              opacity: 0,
-              y: 100 // Start from below
-            });
-            
-            tlRef.current = gsap.timeline({
-              defaults: {
-                duration: 0.8,
-                ease: 'power2.out',
-              },
-              onComplete: () => {
-                onTransitionComplete?.();
-              }
-            })
-            .to(contentRef.current, {
-              opacity: 1,
-              y: 0, // Slide up to final position
-            });
+          // Check if we're transitioning between about, contact, or portfolio sections
+          const slideUpSections = ['about', 'contact', 'portfolio'];
+          const isSlideTransition = slideUpSections.includes(currentSection) && slideUpSections.includes(prevSection);
+          
+          if (slideUpSections.includes(currentSection)) {
+            // Prepare the next content
+            if (isSlideTransition) {
+              // For transitions between slide-up sections, use directional sliding without fades
+              // First quickly hide current content by sliding it up and out
+              gsap.set('#page-transition-overlay', { display: 'none' });
+              gsap.set(contentRef.current, { 
+                opacity: 0,
+                y: 100 // Position new content below
+              });
+              
+              tlRef.current = gsap.timeline({
+                defaults: {
+                  duration: 0.6,
+                  ease: 'power2.inOut',
+                },
+                onComplete: () => {
+                  onTransitionComplete?.();
+                }
+              })
+              .to(contentRef.current, {
+                opacity: 1,
+                y: 0, // Slide up to final position
+              });
+            } else {
+              // Coming from home or other section to a slide section
+              gsap.set(contentRef.current, { 
+                opacity: 0,
+                y: 100 // Start from below
+              });
+              
+              tlRef.current = gsap.timeline({
+                defaults: {
+                  duration: 0.8,
+                  ease: 'power2.out',
+                },
+                onComplete: () => {
+                  onTransitionComplete?.();
+                }
+              })
+              .to(contentRef.current, {
+                opacity: 1,
+                y: 0, // Slide up to final position
+              });
+            }
           } else {
             // For other sections use the fade overlay transition
-            // Set overlay to create smooth transition
             gsap.set('#page-transition-overlay', { 
               display: 'block',
               opacity: 0,
