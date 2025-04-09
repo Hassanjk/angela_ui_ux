@@ -2,36 +2,54 @@ import React, { useState, useEffect } from 'react';
 import Logo from './components/Logo';
 import Navigation from './components/Navigation';
 import Hero from './components/Hero';
+import About from './components/About';
+import Portfolio from './components/Portfolio';
+import Contact from './components/Contact';
 import PageTransition from './components/PageTransition';
 
 function App() {
   const [currentSection, setCurrentSection] = useState('home');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(true);
   
-  // Remove loading class when app loads
-  useEffect(() => {
-    document.body.classList.remove('loading');
-    setIsLoading(false);
-  }, []);
-  
+  const handleTransitionComplete = () => {
+    setIsTransitioning(false);
+  };
+
   const handleNavigate = (section) => {
+    if (section === currentSection) return;
+    setIsTransitioning(true);
+    
     // Add a short delay for visual feedback before transition
     setTimeout(() => {
       setCurrentSection(section);
     }, 100);
   };
 
+  const renderContent = () => {
+    switch (currentSection) {
+      case 'home':
+        return <Hero />;
+      case 'about':
+        return <About />;
+      case 'portfolio':
+        return <Portfolio />;
+      case 'contact':
+        return <Contact />;
+      default:
+        return <Hero />;
+    }
+  };
+
   return (
-    <div className={`relative ${isLoading ? 'hidden' : ''}`}>
+    <div className="relative">
       <Logo />
       <Navigation onNavigate={handleNavigate} />
-      <main>
-        {currentSection === 'home' ? (
-          <Hero />
-        ) : (
-          <PageTransition section={currentSection} />
-        )}
-      </main>
+      <PageTransition 
+        isLoading={isTransitioning} 
+        onTransitionComplete={handleTransitionComplete}
+      >
+        {renderContent()}
+      </PageTransition>
     </div>
   );
 }

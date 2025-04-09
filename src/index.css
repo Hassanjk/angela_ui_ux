@@ -34,60 +34,6 @@ html {
   writing-mode: vertical-rl;
 }
 
-/* Page Loader */
-.js .loading::before,
-.js .loading::after {
-  content: '';
-  position: fixed;
-  z-index: 1000;
-  /* Add animation to automatically hide loader after 5 seconds */
-  animation: hideLoader 5s forwards;
-}
-
-.js .loading::before {
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--color-bg);
-  /* Make slightly transparent for debugging */
-  opacity: 0.9;
-}
-
-.js .loading::after {
-  top: 50%;
-  left: 50%;
-  width: 60px;
-  height: 60px;
-  margin: -30px 0 0 -30px;
-  border-radius: 50%;
-  opacity: 0.4;
-  background: var(--color-link);
-  animation: loaderAnim 0.7s linear infinite alternate forwards, hideLoader 5s forwards;
-}
-
-@keyframes hideLoader {
-  0% {
-    opacity: 1;
-    visibility: visible;
-  }
-  90% {
-    opacity: 1;
-    visibility: visible;
-  }
-  100% {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
-@keyframes loaderAnim {
-  to {
-    opacity: 1;
-    transform: scale3d(0.5,0.5,1);
-  }
-}
-
 .content {
   grid-area: main;
   display: grid;
