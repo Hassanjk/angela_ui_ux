@@ -8,7 +8,7 @@ const preloadImages = (selector = 'img') => {
   });
 };
 
-const PageTransition = ({ isLoading, onTransitionComplete, children }) => {
+const PageTransition = ({ isLoading, onTransitionComplete, currentSection, prevSection, children }) => {
   const layersRef = useRef(null);
   const contentRef = useRef(null);
   const tlRef = useRef(null);
@@ -21,6 +21,12 @@ const PageTransition = ({ isLoading, onTransitionComplete, children }) => {
         gsap.set(layers, {
           opacity: 0,
           clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
+        });
+        
+        // Set initial position of content - hidden and positioned below viewport
+        gsap.set(contentRef.current, { 
+          opacity: 0,
+          y: 100 // Start from below
         });
         
         await preloadImages('.layers__item-img');
@@ -41,8 +47,10 @@ const PageTransition = ({ isLoading, onTransitionComplete, children }) => {
             ease: 'power2.inOut',
           },
           onComplete: () => {
+            // Animate content sliding up after transition completes
             gsap.to(contentRef.current, {
               opacity: 1,
+              y: 0, // Slide up to final position
               duration: 0.8,
               ease: 'power2.out',
               onComplete: () => {
@@ -90,7 +98,7 @@ const PageTransition = ({ isLoading, onTransitionComplete, children }) => {
         tlRef.current.kill();
       }
     };
-  }, [isLoading]);
+  }, [isLoading, currentSection]);
 
   return (
     <>
@@ -113,7 +121,8 @@ const PageTransition = ({ isLoading, onTransitionComplete, children }) => {
             position: 'relative',
             zIndex: 10,
             minHeight: '100vh',
-            width: '100%'
+            width: '100%',
+            transform: 'translateY(100px)' // Initial position before animation
           }}
         >
           {children}

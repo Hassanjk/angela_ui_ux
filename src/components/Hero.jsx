@@ -9,13 +9,13 @@ const Hero = () => {
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
 
   return (
-    <section id="home" className="flex flex-col md:flex-row min-h-screen">
+    <section id="home" className="flex flex-col md:flex-row w-screen h-screen overflow-hidden absolute top-0 left-0 right-0 bottom-0 m-0 p-0">
       {/* Left Section */}
       <motion.div 
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="w-full md:w-1/2 bg-primary-700 flex items-center p-12 relative"
+        className="w-full md:w-1/2 bg-primary-700 flex items-center p-12 relative h-full"
       >
         <div className="max-w-xl text-white">
           <motion.h2 
@@ -67,7 +67,7 @@ const Hero = () => {
         initial={{ x: 100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="w-full md:w-1/2 relative min-h-[50vh] md:min-h-screen bg-gray-100"
+        className="w-full md:w-1/2 relative h-screen bg-gray-100"
       >
         <div className="absolute inset-0">
           <motion.img 

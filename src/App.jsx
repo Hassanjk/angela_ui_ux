@@ -10,14 +10,20 @@ import PageTransition from './components/PageTransition';
 function App() {
   const [currentSection, setCurrentSection] = useState('home');
   const [isTransitioning, setIsTransitioning] = useState(true);
+  const [prevSection, setPrevSection] = useState(null);
   
   const handleTransitionComplete = () => {
     setIsTransitioning(false);
+    // Clear previous section after transition completes
+    setPrevSection(null);
   };
 
   const handleNavigate = (section) => {
-    if (section === currentSection) return;
+    if (section === currentSection || isTransitioning) return;
+    
     setIsTransitioning(true);
+    // Store current section as previous before changing to new section
+    setPrevSection(currentSection);
     
     // Add a short delay for visual feedback before transition
     setTimeout(() => {
@@ -26,18 +32,23 @@ function App() {
   };
 
   const renderContent = () => {
-    switch (currentSection) {
-      case 'home':
-        return <Hero />;
-      case 'about':
-        return <About />;
-      case 'portfolio':
-        return <Portfolio />;
-      case 'contact':
-        return <Contact />;
-      default:
-        return <Hero />;
-    }
+    // Only render current section, and make sure it gets proper transition classes
+    return (
+      <div className="section-container">
+        <div className={`section ${currentSection === 'home' ? 'active' : ''}`}>
+          {currentSection === 'home' && <Hero />}
+        </div>
+        <div className={`section ${currentSection === 'about' ? 'active' : ''}`}>
+          {currentSection === 'about' && <About />}
+        </div>
+        <div className={`section ${currentSection === 'portfolio' ? 'active' : ''}`}>
+          {currentSection === 'portfolio' && <Portfolio />}
+        </div>
+        <div className={`section ${currentSection === 'contact' ? 'active' : ''}`}>
+          {currentSection === 'contact' && <Contact />}
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -47,6 +58,8 @@ function App() {
       <PageTransition 
         isLoading={isTransitioning} 
         onTransitionComplete={handleTransitionComplete}
+        currentSection={currentSection}
+        prevSection={prevSection}
       >
         {renderContent()}
       </PageTransition>
