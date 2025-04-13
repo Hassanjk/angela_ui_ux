@@ -1,16 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
-import imagesLoaded from 'imagesloaded';
-
-const preloadImages = (selector = 'img') => {
-  return new Promise((resolve) => {
-    imagesLoaded(document.querySelectorAll(selector), { background: true }, resolve);
-  });
-};
 
 const PageTransition = ({ isLoading, onTransitionComplete, currentSection, prevSection, children }) => {
   const contentRef = useRef(null);
-  const layersRef = useRef(null);
+  const loaderRef = useRef(null);
   const tlRef = useRef(null);
   const isInitialLoadRef = useRef(true);
 
@@ -27,110 +20,48 @@ const PageTransition = ({ isLoading, onTransitionComplete, currentSection, prevS
         });
         
         // Check if this is the initial page load
-        if (isInitialLoadRef.current && layersRef.current) {
-          const layers = [...layersRef.current.querySelectorAll('.layers__item')];
-          
-          gsap.set(layers, {
-            opacity: 0,
-            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)'
-          });
-          
-          await preloadImages('.layers__item-img');
-
-          const allItems = layers;
-          const lastItem = layers[layers.length - 1];
-          const allInnerItems = layers.map(item => item.querySelector('.layers__item-img'));
-
-          gsap.to(layers, {
-            opacity: 1,
-            duration: 0.1,
-            stagger: 0
-          });
-
-          // Create a sequence for the layer animations
-          const layersTL = gsap.timeline({
+        if (isInitialLoadRef.current && loaderRef.current) {
+          // Initial loading animation
+          const loaderTL = gsap.timeline({
             defaults: {
-              duration: 1.2,
-              ease: 'power2.inOut',
+              duration: 0.8,
+              ease: 'power2.inOut'
             }
-          })
-          .fromTo(allItems, {
-            clipPath: 'polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%)'
-          }, {
-            stagger: {
-              each: 0.1,
-              onComplete: function() {
-                const targetElement = this.targets()[0];
-                const index = layers.indexOf(targetElement);
-                if (index) {
-                  gsap.set(layers[index-1], {opacity: 0});
-                }
-              },
-            },
-            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
-          }, 0)
-          .fromTo(allInnerItems, {
-            scale: 1.2,
-            filter: 'brightness(50%)'
-          }, {
-            scale: 1,
-            filter: 'brightness(100%)',
-            stagger: 0.1,
-          }, 0)
-          .to(lastItem, {
-            duration: 1,
-            ease: 'power4',
-            opacity: 1, // Keep the last item visible instead of clipping it
-            onComplete: () => {
-              // Create a seamless transition by ensuring the next element is ready before fading out
-              gsap.set(contentRef.current, {
-                opacity: 0,
-                y: 0, // Position content without transform to prevent rendering artifacts
-                backgroundColor: '#0e0e0e'
-              });
-              
-              // Fade out layers with a short duration to prevent flashing
-              gsap.to(layersRef.current, {
-                opacity: 0,
-                duration: 0.3,
-                ease: 'power1.inOut',
-                onComplete: () => {
-                  // Hide layers container
-                  gsap.set(layersRef.current, { display: 'none' });
-                  
-                  // Fade in content
-                  gsap.to(contentRef.current, {
-                    opacity: 1,
-                    duration: 0.4,
-                    ease: 'power1.inOut',
-                    onComplete: () => onTransitionComplete?.()
-                  });
-                }
-              });
-            }
-          }, '>');
+          });
+
+          loaderTL
+            .to(loaderRef.current, {
+              scale: 1.2,
+              opacity: 0,
+              duration: 0.5,
+              onComplete: () => {
+                // Hide loader
+                gsap.set(loaderRef.current, { display: 'none' });
+                
+                // Fade in content
+                gsap.to(contentRef.current, {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.6,
+                  ease: 'power2.out',
+                  onComplete: () => onTransitionComplete?.()
+                });
+              }
+            });
           
-          tlRef.current = layersTL;
-          
-          // After initial load, set the flag to false for future transitions
+          tlRef.current = loaderTL;
           isInitialLoadRef.current = false;
         } else {
           // For navigation between sections
-          await preloadImages();
-          
-          // Check if we're transitioning between about, contact, or portfolio sections
           const slideUpSections = ['about', 'contact', 'portfolio'];
           const isSlideTransition = slideUpSections.includes(currentSection) && slideUpSections.includes(prevSection);
           
           if (slideUpSections.includes(currentSection)) {
-            // Prepare the next content
             if (isSlideTransition) {
-              // For transitions between slide-up sections, use directional sliding without fades
-              // First quickly hide current content by sliding it up and out
               gsap.set('#page-transition-overlay', { display: 'none' });
               gsap.set(contentRef.current, { 
                 opacity: 0,
-                y: 100 // Position new content below
+                y: 100
               });
               
               tlRef.current = gsap.timeline({
@@ -144,13 +75,12 @@ const PageTransition = ({ isLoading, onTransitionComplete, currentSection, prevS
               })
               .to(contentRef.current, {
                 opacity: 1,
-                y: 0, // Slide up to final position
+                y: 0,
               });
             } else {
-              // Coming from home or other section to a slide section
               gsap.set(contentRef.current, { 
                 opacity: 0,
-                y: 100 // Start from below
+                y: 100
               });
               
               tlRef.current = gsap.timeline({
@@ -164,18 +94,16 @@ const PageTransition = ({ isLoading, onTransitionComplete, currentSection, prevS
               })
               .to(contentRef.current, {
                 opacity: 1,
-                y: 0, // Slide up to final position
+                y: 0,
               });
             }
           } else {
-            // For other sections use the fade overlay transition
             gsap.set('#page-transition-overlay', { 
               display: 'block',
               opacity: 0,
               backgroundColor: '#0e0e0e'
             });
             
-            // First fade to black
             tlRef.current = gsap.timeline({
               defaults: { ease: 'power2.inOut' },
             })
@@ -183,7 +111,6 @@ const PageTransition = ({ isLoading, onTransitionComplete, currentSection, prevS
               opacity: 1,
               duration: 0.3,
               onComplete: () => {
-                // Switch content during black screen
                 gsap.set(contentRef.current, {
                   opacity: 1,
                   y: 0
@@ -229,37 +156,24 @@ const PageTransition = ({ isLoading, onTransitionComplete, currentSection, prevS
         }}
       />
       
+      {/* Initial loader */}
       {isInitialLoadRef.current && (
-        <div className="layers" ref={layersRef} style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 20,
-          backgroundColor: '#0e0e0e'
-        }}>
-          {[1, 2, 3, 4, 5, 6].map((num) => (
-            <div key={num} className="layers__item" style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%'
-            }}>
-              <div 
-                className="layers__item-img" 
-                style={{
-                  backgroundImage: `url(/images/${num}.jpg)`,
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  width: '100%',
-                  height: '100%'
-                }}
-              />
-            </div>
-          ))}
-        </div>
+        <div 
+          ref={loaderRef} 
+          style={{
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            border: '3px solid #fde3a7',
+            borderTopColor: 'transparent',
+            animation: 'spin 1s linear infinite',
+            zIndex: 20
+          }}
+        />
       )}
       
       <div 
